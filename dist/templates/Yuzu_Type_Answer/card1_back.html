@@ -1,0 +1,373 @@
+<div class="yz-wrap">
+<div class="yz-top">
+  <div class="yz-deck">{{Deck}}</div>
+  <span class="yz-pill" id="yz-timer">⏱ 0:00</span>
+  <span class="yz-pill" id="yz-goal"><svg class="yz-ring" viewBox="0 0 22 22"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" cx="11" cy="11" r="9"/></svg><span id="yz-goal-n">0</span></span>
+  <button class="yz-btn" data-yz="stats" aria-label="Progress">📊</button>
+  <button class="yz-btn" data-yz="settings" aria-label="Appearance">🎨</button>
+</div>
+<div class="yz-face yz-q-face yz-anim"><div class="yz-label">Question</div><div class="yz-q">{{Front}}</div></div>
+</div>
+<div class="yz-wrap" id="yz-back">
+<div class="yz-face yz-a yz-anim"><div class="yz-label">Answer</div>
+<div class="yz-a-content">{{type:Back}}</div>{{#Extra}}<div class="yz-extra">{{Extra}}</div>{{/Extra}}{{#Tags}}<div class="yz-tags">{{Tags}}</div>{{/Tags}}</div>
+</div>
+<script>
+/* Yuzu Theme — runs inside Anki card templates (AnkiMobile, desktop, AnkiDroid, AnkiWeb).
+   NOTE: never write two opening curly braces in a row in this file — Anki would read them as a field. */
+(function () {
+  "use strict";
+
+  var DEFAULTS = {
+    theme: "yuzu", mode: "auto", bg: "aurora", layout: "raised", anim: "pop",
+    font: "system", scale: 1, goal: 100, dayStart: 4,
+    showTimer: true, showGoal: true, showTags: true, showDeck: true, bgImage: ""
+  };
+  var THEMES = [
+    ["yuzu", "Yuzu", "#f5a623"], ["matcha", "Matcha", "#6aa84f"], ["sakura", "Sakura", "#e86a9a"],
+    ["ocean", "Ocean", "#2196f3"], ["lavender", "Lavender", "#7e57c2"], ["mono", "Mono", "#555555"]
+  ];
+  var BGS = [["aurora", "Aurora"], ["gradient", "Gradient"], ["waves", "Waves"], ["dots", "Dots"], ["grid", "Grid"], ["plain", "Plain"], ["image", "Image URL"]];
+  var LAYOUTS = [["raised", "Raised"], ["glass", "Glass"], ["flat", "Flat"], ["minimal", "Minimal"]];
+  var ANIMS = [["pop", "Pop"], ["flip", "Flip"], ["slide", "Slide"], ["fade", "Fade"], ["none", "None"]];
+  var FONTS = [["system", "System"], ["rounded", "Rounded"], ["serif", "Serif"], ["mono", "Mono"]];
+  var MODES = [["auto", "Follow Anki"], ["light", "Light"], ["dark", "Dark"]];
+
+  /* ---------- storage (never throws) ---------- */
+  function load(store, key, fallback) {
+    try { var v = window[store].getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save(store, key, val) {
+    try { window[store].setItem(key, JSON.stringify(val)); } catch (e) { /* storage unavailable */ }
+  }
+  function settings() {
+    var s = load("localStorage", "yuzu.settings", {}), out = {}, k;
+    for (k in DEFAULTS) out[k] = (s && s[k] !== undefined) ? s[k] : DEFAULTS[k];
+    return out;
+  }
+  function setSetting(key, val) {
+    var s = settings(); s[key] = val; save("localStorage", "yuzu.settings", s); apply();
+  }
+
+  /* ---------- dates ---------- */
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function dayKey(d, startHour) {
+    var x = new Date(d.getTime() - startHour * 3600000);
+    return x.getFullYear() + "-" + pad(x.getMonth() + 1) + "-" + pad(x.getDate());
+  }
+  function addDays(d, n) { var x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; }
+
+  /* ---------- review log ---------- */
+  function log() { return load("localStorage", "yuzu.log", { days: {}, total: 0, ms: 0 }); }
+  function today(s) { return dayKey(new Date(), s.dayStart); }
+  function countToday(s) { var d = log().days[today(s)]; return d ? d.n : 0; }
+
+  function streaks(s) {
+    var days = log().days, cur = 0, best = 0, run = 0, i, k;
+    // current streak: today counts if studied, otherwise start from yesterday
+    var start = days[dayKey(new Date(), s.dayStart)] ? 0 : 1;
+    for (i = start; i < 3650; i++) {
+      k = dayKey(addDays(new Date(), -i), s.dayStart);
+      if (days[k] && days[k].n > 0) cur++; else break;
+    }
+    var keys = Object.keys(days).sort(), prev = null;
+    keys.forEach(function (key) {
+      if (!days[key].n) return;
+      var d = new Date(key + "T12:00:00");
+      run = (prev && Math.round((d - prev) / 86400000) === 1) ? run + 1 : 1;
+      if (run > best) best = run;
+      prev = d;
+    });
+    return { cur: cur, best: Math.max(best, cur) };
+  }
+
+  /* ---------- DOM helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function root() { return document.querySelector(".card") || document.body; }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
+
+  function isAnkiNight() {
+    var b = document.body, h = document.documentElement;
+    return /night_?mode/i.test(b.className + " " + h.className);
+  }
+
+  /* ---------- apply appearance ---------- */
+  function apply() {
+    var s = settings(), r = root();
+    var mode = s.mode === "auto" ? (isAnkiNight() ? "dark" : "light") : s.mode;
+    r.setAttribute("data-theme", s.theme);
+    r.setAttribute("data-mode", mode);
+    r.setAttribute("data-bg", s.bg === "image" && !s.bgImage ? "aurora" : s.bg);
+    r.setAttribute("data-layout", s.layout);
+    r.setAttribute("data-anim", s.anim);
+    r.setAttribute("data-font", s.font);
+    r.style.setProperty("--scale", s.scale);
+    if (s.bgImage) r.style.setProperty("--bg-image", 'url("' + s.bgImage.replace(/"/g, "") + '")');
+    toggle("yz-timer", s.showTimer);
+    toggle("yz-goal", s.showGoal);
+    toggleAll(".yz-tags", s.showTags);
+    toggleAll(".yz-deck", s.showDeck, "visibility");
+    renderGoal();
+  }
+  function toggle(id, on) { var el = $(id); if (el) el.style.display = on ? "" : "none"; }
+  function toggleAll(sel, on, prop) {
+    var els = document.querySelectorAll(sel), i;
+    for (i = 0; i < els.length; i++) {
+      if (prop === "visibility") els[i].style.visibility = on ? "" : "hidden";
+      else els[i].style.display = on ? "" : "none";
+    }
+  }
+
+  /* ---------- goal ring ---------- */
+  function renderGoal() {
+    var s = settings(), n = countToday(s), goal = Math.max(1, +s.goal || 100);
+    var fg = document.querySelector("#yz-goal .fg"), label = $("yz-goal-n");
+    var C = 2 * Math.PI * 9;
+    if (fg) { fg.style.strokeDasharray = C; fg.style.strokeDashoffset = C * (1 - Math.min(1, n / goal)); }
+    if (label) label.textContent = n + "/" + goal;
+  }
+
+  /* ---------- timer ---------- */
+  function fmt(ms) { var t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + pad(t % 60); }
+  function startTimer(t0, frozenAt) {
+    var el = $("yz-timer");
+    if (!el) return;
+    if (window.__yzTimer) clearInterval(window.__yzTimer);
+    var draw = function () { el.textContent = "⏱ " + fmt((frozenAt || Date.now()) - t0); };
+    draw();
+    if (!frozenAt) window.__yzTimer = setInterval(draw, 1000);
+  }
+
+  /* ---------- review counting ---------- */
+  function questionKey() {
+    var q = document.querySelector(".yz-q");
+    var t = (q ? q.textContent : "") + "|" + document.querySelectorAll(".yz-q img").length;
+    var h = 0, i;
+    for (i = 0; i < t.length; i++) h = ((h << 5) - h + t.charCodeAt(i)) | 0;
+    return "q" + h;
+  }
+
+  function onFront() {
+    var key = questionKey(), t0 = Date.now();
+    save("sessionStorage", "yuzu.current", { key: key, t0: t0 });
+    window.__yzCurrent = { key: key, t0: t0 };
+    startTimer(t0);
+  }
+
+  function onBack() {
+    var key = questionKey();
+    var cur = window.__yzCurrent || load("sessionStorage", "yuzu.current", null);
+    var now = Date.now();
+    // The front-side display started this card; cloze text differs between sides, so match on recency, not text.
+    var t0 = (cur && now - cur.t0 < 30 * 60000) ? cur.t0 : now;
+    startTimer(t0, now);
+
+    // Count each shown answer once (guards against Anki re-rendering the back side).
+    var stamp = (cur && cur.key ? cur.key : key) + "@" + t0;
+    if (load("sessionStorage", "yuzu.lastCounted", "") === stamp) { renderGoal(); return; }
+    save("sessionStorage", "yuzu.lastCounted", stamp);
+
+    var s = settings(), L = log(), k = today(s);
+    var spent = Math.min(now - t0, 5 * 60000); // cap idle time at 5 min
+    if (!L.days[k]) L.days[k] = { n: 0, ms: 0 };
+    L.days[k].n++; L.days[k].ms += spent;
+    L.total = (L.total || 0) + 1; L.ms = (L.ms || 0) + spent;
+    save("localStorage", "yuzu.log", L);
+    var sess = load("sessionStorage", "yuzu.session", 0) + 1;
+    save("sessionStorage", "yuzu.session", sess);
+
+    renderGoal();
+    var goal = +s.goal || 100;
+    if (L.days[k].n === goal) celebrate();
+  }
+
+  function celebrate() {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var box = document.createElement("div"), i, b;
+    var colors = ["var(--accent)", "var(--accent2)", "#ffd54f", "#4fc3f7", "#f06292"];
+    box.className = "yz-confetti";
+    for (i = 0; i < 60; i++) {
+      b = document.createElement("b");
+      b.style.left = Math.random() * 100 + "%";
+      b.style.background = colors[i % colors.length];
+      b.style.animationDelay = Math.random() * 0.6 + "s";
+      box.appendChild(b);
+    }
+    document.body.appendChild(box);
+    setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 2600);
+  }
+
+  /* ---------- panels ---------- */
+  function overlay(html) {
+    closePanel();
+    var o = document.createElement("div");
+    o.className = "yz-overlay open";
+    o.id = "yz-overlay";
+    o.innerHTML = '<div class="yz-sheet" role="dialog" aria-modal="true">' + html + "</div>";
+    o.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (e.target === o || e.target.getAttribute("data-yz") === "close") closePanel();
+    });
+    o.addEventListener("touchend", function (e) { e.stopPropagation(); });
+    document.body.appendChild(o);
+    return o;
+  }
+  function closePanel() { var o = $("yz-overlay"); if (o) o.parentNode.removeChild(o); }
+
+  function chips(key, list, current) {
+    return '<div class="yz-chips">' + list.map(function (it) {
+      var sw = it[2] ? '<span class="yz-swatch" style="background:' + it[2] + '"></span>' : "";
+      return '<button class="yz-chip' + (String(current) === String(it[0]) ? " on" : "") +
+        '" data-set="' + key + '" data-val="' + it[0] + '">' + sw + esc(it[1]) + "</button>";
+    }).join("") + "</div>";
+  }
+  function onOff(key, label, val) {
+    return chips(key, [[true, label + " on"], [false, "off"]], val);
+  }
+
+  function openSettings() {
+    var s = settings();
+    var html =
+      '<h2>Appearance <button class="yz-btn" data-yz="close" aria-label="Close">✕</button></h2>' +
+      "<h3>Theme</h3>" + chips("theme", THEMES, s.theme) +
+      "<h3>Mode</h3>" + chips("mode", MODES, s.mode) +
+      "<h3>Background</h3>" + chips("bg", BGS, s.bg) +
+      '<div class="yz-row" style="margin-top:8px"><input type="text" id="yz-bgimg" placeholder="https://… image URL or file in collection.media" value="' + esc(s.bgImage) + '"></div>' +
+      '<div class="yz-note">For an offline image, put it in your media folder (e.g. _yuzu_bg.jpg) and type its file name.</div>' +
+      "<h3>Card style</h3>" + chips("layout", LAYOUTS, s.layout) +
+      "<h3>Animation</h3>" + chips("anim", ANIMS, s.anim) +
+      "<h3>Font</h3>" + chips("font", FONTS, s.font) +
+      '<h3>Text size</h3><div class="yz-row"><span>A</span><input type="range" id="yz-scale" min="0.7" max="1.6" step="0.05" value="' + s.scale + '"><span style="font-size:20px">A</span></div>' +
+      "<h3>Top bar</h3>" + onOff("showTimer", "Timer", s.showTimer) +
+      '<div style="height:8px"></div>' + onOff("showGoal", "Daily goal", s.showGoal) +
+      '<div style="height:8px"></div>' + onOff("showDeck", "Deck name", s.showDeck) +
+      '<div style="height:8px"></div>' + onOff("showTags", "Tags", s.showTags) +
+      '<h3>Daily goal (cards)</h3><div class="yz-row"><input type="number" id="yz-goalin" min="1" max="9999" value="' + s.goal + '"></div>' +
+      '<h3>New day starts at (hour)</h3><div class="yz-row"><input type="number" id="yz-daystart" min="0" max="23" value="' + s.dayStart + '"></div>' +
+      '<div class="yz-note">Settings are saved on this device. Set them once on each device you study on.</div>';
+    var o = overlay(html);
+    o.addEventListener("click", function (e) {
+      var t = e.target.closest ? e.target.closest("[data-set]") : null;
+      if (!t) return;
+      var v = t.getAttribute("data-val");
+      setSetting(t.getAttribute("data-set"), v === "true" ? true : v === "false" ? false : v);
+      openSettings();
+    });
+    var bind = function (id, key, num) {
+      var el = $(id); if (!el) return;
+      el.addEventListener("change", function () {
+        var v = num ? Math.max(num[0], Math.min(num[1], +el.value || 0)) : el.value.trim();
+        setSetting(key, v);
+      });
+    };
+    bind("yz-goalin", "goal", [1, 9999]);
+    bind("yz-daystart", "dayStart", [0, 23]);
+    bind("yz-bgimg", "bgImage");
+    var sc = $("yz-scale");
+    if (sc) sc.addEventListener("input", function () { setSetting("scale", +sc.value); });
+  }
+
+  function openStats() {
+    var s = settings(), L = log(), st = streaks(s), goal = +s.goal || 100;
+    var t = L.days[today(s)] || { n: 0, ms: 0 };
+    var active = Object.keys(L.days).filter(function (k) { return L.days[k].n > 0; }).length;
+    var avgSec = L.total ? Math.round(L.ms / L.total / 1000) : 0;
+    var sess = load("sessionStorage", "yuzu.session", 0);
+
+    // Heatmap: last 26 weeks, columns = weeks (Sun..Sat)
+    var weeks = 26, end = new Date(Date.now() - s.dayStart * 3600000);
+    var startD = addDays(end, -((weeks - 1) * 7 + end.getDay()));
+    var cells = "", i, d, k, n, lvl, todayK = today(s);
+    for (i = 0; i < weeks * 7; i++) {
+      d = addDays(startD, i);
+      k = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+      n = L.days[k] ? L.days[k].n : 0;
+      lvl = n === 0 ? 0 : n < goal * 0.25 ? 1 : n < goal * 0.5 ? 2 : n < goal ? 3 : 4;
+      cells += '<i data-l="' + lvl + '" class="' + (k === todayK ? "today" : "") + (d > end ? " future" : "") +
+        '" title="' + k + ": " + n + '"></i>';
+    }
+
+    overlay(
+      '<h2>Your progress <button class="yz-btn" data-yz="close" aria-label="Close">✕</button></h2>' +
+      '<h3>Today</h3><div class="yz-stats">' +
+        stat(t.n, "reviewed") + stat(Math.round(Math.min(100, t.n / goal * 100)) + "%", "of goal") + stat(fmt(t.ms), "time") +
+      "</div>" +
+      '<h3>Streak</h3><div class="yz-stats">' +
+        stat("🔥 " + st.cur, "current") + stat(st.best, "best") + stat(sess, "this session") +
+      "</div>" +
+      '<h3>Last 6 months</h3><div class="yz-heat">' + cells + "</div>" +
+      '<h3>All time</h3><div class="yz-stats">' +
+        stat(L.total || 0, "cards") + stat(active, "days studied") + stat(avgSec + "s", "avg / card") +
+      "</div>" +
+      '<div class="yz-note">Counted by this theme on this device each time you reveal an answer on a Yuzu card. Anki\'s own Stats screen remains the official record.</div>' +
+      '<div style="margin-top:14px"><button class="yz-chip" id="yz-reset">Reset theme stats</button></div>'
+    );
+    var r = $("yz-reset");
+    if (r) r.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (r.getAttribute("data-armed")) { save("localStorage", "yuzu.log", { days: {}, total: 0, ms: 0 }); renderGoal(); openStats(); }
+      else { r.setAttribute("data-armed", "1"); r.textContent = "Tap again to erase"; }
+    });
+  }
+  function stat(v, label) { return '<div class="yz-stat"><b>' + v + "</b><span>" + label + "</span></div>"; }
+
+  /* ---------- tags -> chips ---------- */
+  function chipTags() {
+    var boxes = document.querySelectorAll(".yz-tags"), i;
+    for (i = 0; i < boxes.length; i++) {
+      if (boxes[i].__yz) continue;
+      boxes[i].__yz = true;
+      var words = boxes[i].textContent.trim().split(/\s+/).filter(Boolean);
+      boxes[i].innerHTML = words.map(function (w) {
+        return '<span class="yz-tag">' + esc(w.split("::").pop()) + "</span>";
+      }).join("");
+    }
+  }
+
+  /* ---------- wiring ---------- */
+  function wire() {
+    var btns = document.querySelectorAll("[data-yz]"), i;
+    for (i = 0; i < btns.length; i++) {
+      if (btns[i].__yz) continue;
+      btns[i].__yz = true;
+      btns[i].addEventListener("click", function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var a = this.getAttribute("data-yz");
+        if (a === "settings") openSettings();
+        else if (a === "stats") openStats();
+      });
+    }
+    var hints = document.querySelectorAll(".yz-hint"), j;
+    for (j = 0; j < hints.length; j++) {
+      if (hints[j].__yz) continue;
+      hints[j].__yz = true;
+      hints[j].addEventListener("click", function (e) { e.stopPropagation(); this.classList.toggle("open"); });
+    }
+    if (!window.__yzKeys) {
+      window.__yzKeys = true;
+      document.addEventListener("keydown", function (e) {
+        if (e.target && /input|textarea/i.test(e.target.tagName)) return;
+        if (e.key === "Escape") closePanel();
+        if (e.key === "h" || e.key === "H") { var h = document.querySelector(".yz-hint"); if (h) h.classList.toggle("open"); }
+      });
+    }
+  }
+
+  function init() {
+    closePanel();
+    chipTags();
+    apply();
+    wire();
+    if (document.getElementById("yz-back")) onBack(); else onFront();
+    // Re-apply if Anki toggles night mode while a card is open
+    if (window.MutationObserver && !window.__yzObs) {
+      window.__yzObs = new MutationObserver(function () { if (settings().mode === "auto") apply(); });
+      window.__yzObs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    }
+  }
+
+  // Anki inserts the card HTML first, then runs scripts; defer one tick so the back side's markup is present.
+  setTimeout(init, 0);
+})();
+
+</script>
