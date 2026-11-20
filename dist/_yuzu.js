@@ -1,0 +1,429 @@
+var YZ_CSS = "/* ===========================================================\n   Yuzu Theme \u2014 card styling (works on AnkiMobile, desktop, AnkiDroid, AnkiWeb)\n   Colors are driven by CSS variables set from data-theme / data-mode.\n   =========================================================== */\n\n/* ---------- Palettes (light) ---------- */\nhtml, body, .card { --radius: 22px; }\n\n.card[data-theme=\"yuzu\"]     { --bg1:#fff8e1; --bg2:#ffe0b2; --surface:#ffffff; --text:#3b2f1e; --muted:#8d7a5f; --accent:#f5a623; --accent2:#ff7043; --border:#f3e2c0; }\n.card[data-theme=\"matcha\"]   { --bg1:#eef6e8; --bg2:#cfe8c0; --surface:#fbfff8; --text:#24331d; --muted:#6c7f62; --accent:#6aa84f; --accent2:#2e7d32; --border:#d6e8cb; }\n.card[data-theme=\"sakura\"]   { --bg1:#fff0f5; --bg2:#f8c8dc; --surface:#ffffff; --text:#3d2230; --muted:#9a7486; --accent:#e86a9a; --accent2:#c2185b; --border:#f6d6e3; }\n.card[data-theme=\"ocean\"]    { --bg1:#e8f4fd; --bg2:#b3dcf7; --surface:#ffffff; --text:#14304a; --muted:#5f7d96; --accent:#2196f3; --accent2:#00897b; --border:#cfe5f5; }\n.card[data-theme=\"lavender\"] { --bg1:#f3effd; --bg2:#d6cbf5; --surface:#ffffff; --text:#2a2340; --muted:#7a6f99; --accent:#7e57c2; --accent2:#5e35b1; --border:#e2dbf7; }\n.card[data-theme=\"mono\"]     { --bg1:#f4f4f4; --bg2:#e2e2e2; --surface:#ffffff; --text:#1d1d1f; --muted:#77777c; --accent:#1d1d1f; --accent2:#555; --border:#e3e3e3; }\n\n/* ---------- Palettes (dark) ---------- */\n.card[data-mode=\"dark\"][data-theme=\"yuzu\"]     { --bg1:#1f1a12; --bg2:#33261a; --surface:#2a2219; --text:#f4e7d1; --muted:#b39f80; --accent:#f7b84b; --accent2:#ff8a65; --border:#3d3122; }\n.card[data-mode=\"dark\"][data-theme=\"matcha\"]   { --bg1:#121a10; --bg2:#1d2c18; --surface:#1a2416; --text:#e2efd9; --muted:#97ad8b; --accent:#8bc34a; --accent2:#66bb6a; --border:#2b3a25; }\n.card[data-mode=\"dark\"][data-theme=\"sakura\"]   { --bg1:#1d1218; --bg2:#33192a; --surface:#271a21; --text:#f6e1ea; --muted:#bb93a6; --accent:#f48fb1; --accent2:#ec407a; --border:#3e2633; }\n.card[data-mode=\"dark\"][data-theme=\"ocean\"]    { --bg1:#0d1620; --bg2:#13283b; --surface:#152230; --text:#dcecf9; --muted:#87a4bd; --accent:#4fb3ff; --accent2:#26a69a; --border:#213547; }\n.card[data-mode=\"dark\"][data-theme=\"lavender\"] { --bg1:#15121f; --bg2:#251d3b; --surface:#1e1a2b; --text:#e9e3fa; --muted:#a397c4; --accent:#b39ddb; --accent2:#9575cd; --border:#302944; }\n.card[data-mode=\"dark\"][data-theme=\"mono\"]     { --bg1:#0f0f10; --bg2:#1b1b1d; --surface:#1a1a1c; --text:#ececee; --muted:#8e8e93; --accent:#ececee; --accent2:#aaa; --border:#2c2c2e; }\n\n/* ---------- Base ---------- */\n.card {\n  margin: 0;\n  min-height: 100vh;\n  box-sizing: border-box;\n  padding: 14px 14px 40px;\n  color: var(--text);\n  background: var(--bg1);\n  font-family: var(--font, -apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", \"Hiragino Sans\", sans-serif);\n  font-size: calc(20px * var(--scale, 1));\n  line-height: 1.5;\n  text-align: center;\n  -webkit-text-size-adjust: 100%;\n  transition: background .3s, color .3s;\n}\n.card * { box-sizing: border-box; }\n\n/* Font choices */\n.card[data-font=\"rounded\"] { --font: ui-rounded, \"SF Pro Rounded\", \"Hiragino Maru Gothic ProN\", \"Nunito\", system-ui, sans-serif; }\n.card[data-font=\"serif\"]   { --font: \"New York\", \"Iowan Old Style\", Georgia, \"Hiragino Mincho ProN\", serif; }\n.card[data-font=\"mono\"]    { --font: ui-monospace, \"SF Mono\", Menlo, Consolas, monospace; }\n\n/* ---------- Backgrounds ---------- */\n.card[data-bg=\"gradient\"] { background: linear-gradient(160deg, var(--bg1) 0%, var(--bg2) 100%) fixed; }\n.card[data-bg=\"dots\"]     { background: var(--bg1) radial-gradient(color-mix(in srgb, var(--accent) 25%, transparent) 1.5px, transparent 1.6px) 0 0/22px 22px fixed; }\n.card[data-bg=\"grid\"]     { background: var(--bg1) fixed;\n  background-image: linear-gradient(color-mix(in srgb, var(--accent) 12%, transparent) 1px, transparent 1px),\n                    linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent) 1px, transparent 1px);\n  background-size: 28px 28px; }\n.card[data-bg=\"waves\"]    { background:\n  radial-gradient(120% 60% at 0% 100%, var(--bg2) 0 40%, transparent 41%) fixed,\n  radial-gradient(120% 60% at 100% 0%, var(--bg2) 0 30%, transparent 31%) fixed,\n  var(--bg1); }\n.card[data-bg=\"aurora\"]   { background:\n  radial-gradient(60% 50% at 15% 10%, color-mix(in srgb, var(--accent) 35%, transparent), transparent 70%) fixed,\n  radial-gradient(50% 50% at 90% 30%, color-mix(in srgb, var(--accent2) 30%, transparent), transparent 70%) fixed,\n  radial-gradient(70% 60% at 50% 100%, var(--bg2), transparent 70%) fixed,\n  var(--bg1); }\n.card[data-bg=\"image\"]    { background: var(--bg1) var(--bg-image) center/cover fixed; }\n.card[data-bg=\"plain\"]    { background: var(--bg1); }\n\n/* ---------- Layout ---------- */\n.yz-wrap { max-width: 760px; margin: 0 auto; }\n\n.yz-top {\n  display: flex; align-items: center; gap: 8px;\n  margin-bottom: 12px; font-size: 14px; color: var(--muted);\n}\n.yz-deck {\n  flex: 1; min-width: 0; text-align: left;\n  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;\n  font-weight: 600;\n}\n.yz-pill {\n  display: inline-flex; align-items: center; gap: 5px;\n  padding: 5px 10px; border-radius: 999px;\n  background: color-mix(in srgb, var(--surface) 80%, transparent);\n  border: 1px solid var(--border);\n  font-variant-numeric: tabular-nums; white-space: nowrap;\n  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);\n}\n.yz-btn {\n  appearance: none; -webkit-appearance: none; cursor: pointer;\n  border: 1px solid var(--border); background: color-mix(in srgb, var(--surface) 80%, transparent);\n  color: var(--text); border-radius: 999px; width: 36px; height: 36px;\n  font-size: 17px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;\n  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);\n  -webkit-tap-highlight-color: transparent;\n}\n.yz-btn:active { transform: scale(.92); }\n\n/* Goal ring */\n.yz-ring { width: 22px; height: 22px; transform: rotate(-90deg); }\n.yz-ring circle { fill: none; stroke-width: 4; }\n.yz-ring .bg { stroke: var(--border); }\n.yz-ring .fg { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .6s ease; }\n\n/* Card faces */\n.yz-face {\n  background: var(--surface);\n  border: 1px solid var(--border);\n  border-radius: var(--radius);\n  padding: 28px 22px;\n  box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--text) 25%, transparent),\n              0 2px 6px -2px color-mix(in srgb, var(--text) 10%, transparent);\n  overflow-wrap: anywhere;\n}\n.card[data-layout=\"flat\"] .yz-face { box-shadow: none; }\n.card[data-layout=\"glass\"] .yz-face {\n  background: color-mix(in srgb, var(--surface) 62%, transparent);\n  -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);\n}\n.card[data-layout=\"minimal\"] .yz-face { background: transparent; border-color: transparent; box-shadow: none; }\n\n.yz-q { font-size: 1.35em; font-weight: 600; }\n.yz-a { margin-top: 14px; border-top: 4px solid var(--accent); }\n.yz-a-content { font-size: 1.1em; }\n.yz-label {\n  font-size: 11px; letter-spacing: .12em; text-transform: uppercase;\n  color: var(--muted); font-weight: 700; margin-bottom: 10px;\n}\n.yz-extra {\n  margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border);\n  font-size: .85em; color: var(--muted); text-align: left;\n}\n.yz-tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }\n.yz-tag {\n  font-size: 12px; padding: 3px 9px; border-radius: 999px;\n  background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent2);\n}\n\n/* Media inside cards */\n.yz-face img { max-width: 100%; height: auto; border-radius: 12px; }\n.yz-face a { color: var(--accent2); }\n.yz-face code { font-family: ui-monospace, Menlo, monospace; background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 1px 6px; border-radius: 6px; }\n.yz-face hr { border: 0; border-top: 1px solid var(--border); }\n.yz-face table { margin: 0 auto; border-collapse: collapse; }\n.yz-face td, .yz-face th { border: 1px solid var(--border); padding: 4px 10px; }\n.cloze { font-weight: 700; color: var(--accent2); }\n.cloze-inactive { color: var(--muted); }\n\n/* Tap-to-reveal hint */\n.yz-hint {\n  margin-top: 16px; display: inline-block; cursor: pointer;\n  padding: 8px 16px; border-radius: 14px;\n  border: 1px dashed var(--accent); color: var(--accent2);\n  font-size: .8em; -webkit-tap-highlight-color: transparent;\n  user-select: none; -webkit-user-select: none;\n}\n.yz-hint .yz-hint-body { display: none; color: var(--text); }\n.yz-hint.open { border-style: solid; background: color-mix(in srgb, var(--accent) 10%, transparent); }\n.yz-hint.open .yz-hint-label { display: none; }\n.yz-hint.open .yz-hint-body { display: inline; }\n\n/* Universal mode: keep the imported deck's own text sizing */\n.yz-q-plain { font-size: 1em; font-weight: inherit; }\n.yz-u .yz-q-plain, .yz-u .yz-a-content { text-align: inherit; }\n\n/* Hide the default answer separator */\n#answer { display: none; }\n\n/* ---------- Animations ---------- */\n@keyframes yz-pop    { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: none; } }\n@keyframes yz-fade   { from { opacity: 0; } to { opacity: 1; } }\n@keyframes yz-flip   { from { opacity: 0; transform: perspective(900px) rotateX(-25deg); } to { opacity: 1; transform: none; } }\n@keyframes yz-slide  { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }\n.card[data-anim=\"pop\"]   .yz-anim { animation: yz-pop .35s cubic-bezier(.2,.8,.2,1) both; }\n.card[data-anim=\"fade\"]  .yz-anim { animation: yz-fade .3s ease both; }\n.card[data-anim=\"flip\"]  .yz-anim { animation: yz-flip .45s cubic-bezier(.2,.8,.2,1) both; transform-origin: top center; }\n.card[data-anim=\"slide\"] .yz-anim { animation: yz-slide .3s ease-out both; }\n.card[data-side=\"back\"] .yz-q-face.yz-anim { animation: none; }\n@media (prefers-reduced-motion: reduce) { .card .yz-anim { animation: none !important; } }\n\n/* ---------- Panels (settings / stats) ---------- */\n.yz-overlay {\n  position: fixed; inset: 0; z-index: 1000;\n  background: rgba(0,0,0,.35); display: none;\n  align-items: flex-end; justify-content: center;\n  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);\n}\n.yz-overlay.open { display: flex; animation: yz-fade .2s ease both; }\n.yz-sheet {\n  width: 100%; max-width: 560px; max-height: 85vh; overflow-y: auto;\n  -webkit-overflow-scrolling: touch;\n  background: var(--surface); color: var(--text);\n  border-radius: 24px 24px 0 0; padding: 18px 18px 30px;\n  text-align: left; font-size: 15px;\n  box-shadow: 0 -10px 40px rgba(0,0,0,.25);\n  animation: yz-pop .3s cubic-bezier(.2,.8,.2,1) both;\n}\n@media (min-width: 700px) {\n  .yz-overlay { align-items: center; }\n  .yz-sheet { border-radius: 24px; }\n}\n.yz-sheet h2 { margin: 0 0 4px; font-size: 20px; display: flex; align-items: center; justify-content: space-between; }\n.yz-sheet h3 { margin: 18px 0 8px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }\n.yz-chips { display: flex; flex-wrap: wrap; gap: 8px; }\n.yz-chip {\n  appearance: none; -webkit-appearance: none; cursor: pointer;\n  border: 1.5px solid var(--border); background: transparent; color: var(--text);\n  padding: 7px 13px; border-radius: 999px; font: inherit; font-size: 14px;\n  -webkit-tap-highlight-color: transparent;\n}\n.yz-chip.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); font-weight: 600; }\n.yz-swatch { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }\n.yz-row { display: flex; align-items: center; gap: 10px; }\n.yz-row input[type=\"range\"] { flex: 1; accent-color: var(--accent); }\n.yz-row input[type=\"number\"], .yz-row input[type=\"text\"] {\n  flex: 1; font: inherit; padding: 8px 10px; border-radius: 10px;\n  border: 1px solid var(--border); background: var(--bg1); color: var(--text); min-width: 0;\n}\n.yz-note { font-size: 12px; color: var(--muted); margin-top: 6px; }\n\n/* Stats */\n.yz-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }\n.yz-stat { background: var(--bg1); border: 1px solid var(--border); border-radius: 14px; padding: 10px; text-align: center; }\n.yz-stat b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }\n.yz-stat span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }\n\n.yz-heat { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; overflow-x: auto; padding-bottom: 4px; }\n.yz-heat i { display: block; width: 13px; height: 13px; border-radius: 3px; background: var(--border); }\n.yz-heat i[data-l=\"1\"] { background: color-mix(in srgb, var(--accent) 30%, var(--border)); }\n.yz-heat i[data-l=\"2\"] { background: color-mix(in srgb, var(--accent) 55%, var(--border)); }\n.yz-heat i[data-l=\"3\"] { background: color-mix(in srgb, var(--accent) 80%, var(--border)); }\n.yz-heat i[data-l=\"4\"] { background: var(--accent2); }\n.yz-heat i.today { outline: 2px solid var(--text); outline-offset: 1px; }\n.yz-heat i.future { visibility: hidden; }\n\n/* Celebrate goal */\n.yz-confetti { position: fixed; inset: 0; pointer-events: none; z-index: 1100; overflow: hidden; }\n.yz-confetti b { position: absolute; top: -12px; width: 8px; height: 12px; border-radius: 2px; animation: yz-fall 1.6s ease-in forwards; }\n@keyframes yz-fall { to { transform: translateY(110vh) rotate(540deg); opacity: .6; } }\n\n/* Fallback for very old WebViews without color-mix */\n@supports not (color: color-mix(in srgb, red 50%, blue)) {\n  .yz-pill, .yz-btn { background: var(--surface); }\n  .card[data-layout=\"glass\"] .yz-face { background: var(--surface); }\n  .yz-tag { background: var(--bg2); }\n  .yz-heat i[data-l=\"1\"], .yz-heat i[data-l=\"2\"] { background: var(--bg2); }\n  .yz-heat i[data-l=\"3\"] { background: var(--accent); }\n}\n";
+/* Yuzu Theme — runs inside Anki card templates (AnkiMobile, desktop, AnkiDroid, AnkiWeb).
+   NOTE: never write two opening curly braces in a row in this file — Anki would read them as a field. */
+(function () {
+  "use strict";
+
+  var DEFAULTS = {
+    theme: "yuzu", mode: "auto", bg: "aurora", layout: "raised", anim: "pop",
+    font: "system", scale: 1, goal: 100, dayStart: 4,
+    showTimer: true, showGoal: true, showTags: true, showDeck: true, bgImage: ""
+  };
+  var THEMES = [
+    ["yuzu", "Yuzu", "#f5a623"], ["matcha", "Matcha", "#6aa84f"], ["sakura", "Sakura", "#e86a9a"],
+    ["ocean", "Ocean", "#2196f3"], ["lavender", "Lavender", "#7e57c2"], ["mono", "Mono", "#555555"]
+  ];
+  var BGS = [["aurora", "Aurora"], ["gradient", "Gradient"], ["waves", "Waves"], ["dots", "Dots"], ["grid", "Grid"], ["plain", "Plain"], ["image", "Image URL"]];
+  var LAYOUTS = [["raised", "Raised"], ["glass", "Glass"], ["flat", "Flat"], ["minimal", "Minimal"]];
+  var ANIMS = [["pop", "Pop"], ["flip", "Flip"], ["slide", "Slide"], ["fade", "Fade"], ["none", "None"]];
+  var FONTS = [["system", "System"], ["rounded", "Rounded"], ["serif", "Serif"], ["mono", "Mono"]];
+  var MODES = [["auto", "Follow Anki"], ["light", "Light"], ["dark", "Dark"]];
+
+  /* ---------- storage (never throws) ---------- */
+  function load(store, key, fallback) {
+    try { var v = window[store].getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+  function save(store, key, val) {
+    try { window[store].setItem(key, JSON.stringify(val)); } catch (e) { /* storage unavailable */ }
+  }
+  function settings() {
+    var s = load("localStorage", "yuzu.settings", {}), out = {}, k;
+    for (k in DEFAULTS) out[k] = (s && s[k] !== undefined) ? s[k] : DEFAULTS[k];
+    return out;
+  }
+  function setSetting(key, val) {
+    var s = settings(); s[key] = val; save("localStorage", "yuzu.settings", s); apply();
+  }
+
+  /* ---------- dates ---------- */
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function dayKey(d, startHour) {
+    var x = new Date(d.getTime() - startHour * 3600000);
+    return x.getFullYear() + "-" + pad(x.getMonth() + 1) + "-" + pad(x.getDate());
+  }
+  function addDays(d, n) { var x = new Date(d.getTime()); x.setDate(x.getDate() + n); return x; }
+
+  /* ---------- review log ---------- */
+  function log() { return load("localStorage", "yuzu.log", { days: {}, total: 0, ms: 0 }); }
+  function today(s) { return dayKey(new Date(), s.dayStart); }
+  function countToday(s) { var d = log().days[today(s)]; return d ? d.n : 0; }
+
+  function streaks(s) {
+    var days = log().days, cur = 0, best = 0, run = 0, i, k;
+    // current streak: today counts if studied, otherwise start from yesterday
+    var start = days[dayKey(new Date(), s.dayStart)] ? 0 : 1;
+    for (i = start; i < 3650; i++) {
+      k = dayKey(addDays(new Date(), -i), s.dayStart);
+      if (days[k] && days[k].n > 0) cur++; else break;
+    }
+    var keys = Object.keys(days).sort(), prev = null;
+    keys.forEach(function (key) {
+      if (!days[key].n) return;
+      var d = new Date(key + "T12:00:00");
+      run = (prev && Math.round((d - prev) / 86400000) === 1) ? run + 1 : 1;
+      if (run > best) best = run;
+      prev = d;
+    });
+    return { cur: cur, best: Math.max(best, cur) };
+  }
+
+  /* ---------- DOM helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function root() { return document.querySelector(".card") || document.body; }
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]; }); }
+
+  function isAnkiNight() {
+    var b = document.body, h = document.documentElement;
+    return /night_?mode/i.test(b.className + " " + h.className);
+  }
+
+  /* ---------- apply appearance ---------- */
+  function apply() {
+    var s = settings(), r = root();
+    var mode = s.mode === "auto" ? (isAnkiNight() ? "dark" : "light") : s.mode;
+    r.setAttribute("data-theme", s.theme);
+    r.setAttribute("data-mode", mode);
+    r.setAttribute("data-bg", s.bg === "image" && !s.bgImage ? "aurora" : s.bg);
+    r.setAttribute("data-layout", s.layout);
+    r.setAttribute("data-anim", s.anim);
+    r.setAttribute("data-font", s.font);
+    r.style.setProperty("--scale", s.scale);
+    if (s.bgImage) r.style.setProperty("--bg-image", 'url("' + s.bgImage.replace(/"/g, "") + '")');
+    toggle("yz-timer", s.showTimer);
+    toggle("yz-goal", s.showGoal);
+    toggleAll(".yz-tags", s.showTags);
+    toggleAll(".yz-deck", s.showDeck, "visibility");
+    renderGoal();
+  }
+  function toggle(id, on) { var el = $(id); if (el) el.style.display = on ? "" : "none"; }
+  function toggleAll(sel, on, prop) {
+    var els = document.querySelectorAll(sel), i;
+    for (i = 0; i < els.length; i++) {
+      if (prop === "visibility") els[i].style.visibility = on ? "" : "hidden";
+      else els[i].style.display = on ? "" : "none";
+    }
+  }
+
+  /* ---------- goal ring ---------- */
+  function renderGoal() {
+    var s = settings(), n = countToday(s), goal = Math.max(1, +s.goal || 100);
+    var fg = document.querySelector("#yz-goal .fg"), label = $("yz-goal-n");
+    var C = 2 * Math.PI * 9;
+    if (fg) { fg.style.strokeDasharray = C; fg.style.strokeDashoffset = C * (1 - Math.min(1, n / goal)); }
+    if (label) label.textContent = n + "/" + goal;
+  }
+
+  /* ---------- timer ---------- */
+  function fmt(ms) { var t = Math.floor(ms / 1000); return Math.floor(t / 60) + ":" + pad(t % 60); }
+  function startTimer(t0, frozenAt) {
+    var el = $("yz-timer");
+    if (!el) return;
+    if (window.__yzTimer) clearInterval(window.__yzTimer);
+    var draw = function () { el.textContent = "⏱ " + fmt((frozenAt || Date.now()) - t0); };
+    draw();
+    if (!frozenAt) window.__yzTimer = setInterval(draw, 1000);
+  }
+
+  /* ---------- review counting ---------- */
+  function questionKey() {
+    var q = document.querySelector(".yz-q");
+    var t = (q ? q.textContent : "") + "|" + document.querySelectorAll(".yz-q img").length;
+    var h = 0, i;
+    for (i = 0; i < t.length; i++) h = ((h << 5) - h + t.charCodeAt(i)) | 0;
+    return "q" + h;
+  }
+
+  function onFront() {
+    var key = questionKey(), t0 = Date.now();
+    save("sessionStorage", "yuzu.current", { key: key, t0: t0 });
+    window.__yzCurrent = { key: key, t0: t0 };
+    startTimer(t0);
+  }
+
+  function onBack() {
+    var key = questionKey();
+    var cur = window.__yzCurrent || load("sessionStorage", "yuzu.current", null);
+    var now = Date.now();
+    // The front-side display started this card; cloze text differs between sides, so match on recency, not text.
+    var t0 = (cur && now - cur.t0 < 30 * 60000) ? cur.t0 : now;
+    startTimer(t0, now);
+
+    // Count each shown answer once (guards against Anki re-rendering the back side).
+    var stamp = (cur && cur.key ? cur.key : key) + "@" + t0;
+    if (load("sessionStorage", "yuzu.lastCounted", "") === stamp) { renderGoal(); return; }
+    save("sessionStorage", "yuzu.lastCounted", stamp);
+
+    var s = settings(), L = log(), k = today(s);
+    var spent = Math.min(now - t0, 5 * 60000); // cap idle time at 5 min
+    if (!L.days[k]) L.days[k] = { n: 0, ms: 0 };
+    L.days[k].n++; L.days[k].ms += spent;
+    L.total = (L.total || 0) + 1; L.ms = (L.ms || 0) + spent;
+    save("localStorage", "yuzu.log", L);
+    var sess = load("sessionStorage", "yuzu.session", 0) + 1;
+    save("sessionStorage", "yuzu.session", sess);
+
+    renderGoal();
+    var goal = +s.goal || 100;
+    if (L.days[k].n === goal) celebrate();
+  }
+
+  function celebrate() {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var box = document.createElement("div"), i, b;
+    var colors = ["var(--accent)", "var(--accent2)", "#ffd54f", "#4fc3f7", "#f06292"];
+    box.className = "yz-confetti";
+    for (i = 0; i < 60; i++) {
+      b = document.createElement("b");
+      b.style.left = Math.random() * 100 + "%";
+      b.style.background = colors[i % colors.length];
+      b.style.animationDelay = Math.random() * 0.6 + "s";
+      box.appendChild(b);
+    }
+    document.body.appendChild(box);
+    setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 2600);
+  }
+
+  /* ---------- panels ---------- */
+  function overlay(html) {
+    closePanel();
+    var o = document.createElement("div");
+    o.className = "yz-overlay open";
+    o.id = "yz-overlay";
+    o.innerHTML = '<div class="yz-sheet" role="dialog" aria-modal="true">' + html + "</div>";
+    o.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (e.target === o || e.target.getAttribute("data-yz") === "close") closePanel();
+    });
+    o.addEventListener("touchend", function (e) { e.stopPropagation(); });
+    document.body.appendChild(o);
+    return o;
+  }
+  function closePanel() { var o = $("yz-overlay"); if (o) o.parentNode.removeChild(o); }
+
+  function chips(key, list, current) {
+    return '<div class="yz-chips">' + list.map(function (it) {
+      var sw = it[2] ? '<span class="yz-swatch" style="background:' + it[2] + '"></span>' : "";
+      return '<button class="yz-chip' + (String(current) === String(it[0]) ? " on" : "") +
+        '" data-set="' + key + '" data-val="' + it[0] + '">' + sw + esc(it[1]) + "</button>";
+    }).join("") + "</div>";
+  }
+  function onOff(key, label, val) {
+    return chips(key, [[true, label + " on"], [false, "off"]], val);
+  }
+
+  function openSettings() {
+    var s = settings();
+    var html =
+      '<h2>Appearance <button class="yz-btn" data-yz="close" aria-label="Close">✕</button></h2>' +
+      "<h3>Theme</h3>" + chips("theme", THEMES, s.theme) +
+      "<h3>Mode</h3>" + chips("mode", MODES, s.mode) +
+      "<h3>Background</h3>" + chips("bg", BGS, s.bg) +
+      '<div class="yz-row" style="margin-top:8px"><input type="text" id="yz-bgimg" placeholder="https://… image URL or file in collection.media" value="' + esc(s.bgImage) + '"></div>' +
+      '<div class="yz-note">For an offline image, put it in your media folder (e.g. _yuzu_bg.jpg) and type its file name.</div>' +
+      "<h3>Card style</h3>" + chips("layout", LAYOUTS, s.layout) +
+      "<h3>Animation</h3>" + chips("anim", ANIMS, s.anim) +
+      "<h3>Font</h3>" + chips("font", FONTS, s.font) +
+      '<h3>Text size</h3><div class="yz-row"><span>A</span><input type="range" id="yz-scale" min="0.7" max="1.6" step="0.05" value="' + s.scale + '"><span style="font-size:20px">A</span></div>' +
+      "<h3>Top bar</h3>" + onOff("showTimer", "Timer", s.showTimer) +
+      '<div style="height:8px"></div>' + onOff("showGoal", "Daily goal", s.showGoal) +
+      '<div style="height:8px"></div>' + onOff("showDeck", "Deck name", s.showDeck) +
+      '<div style="height:8px"></div>' + onOff("showTags", "Tags", s.showTags) +
+      '<h3>Daily goal (cards)</h3><div class="yz-row"><input type="number" id="yz-goalin" min="1" max="9999" value="' + s.goal + '"></div>' +
+      '<h3>New day starts at (hour)</h3><div class="yz-row"><input type="number" id="yz-daystart" min="0" max="23" value="' + s.dayStart + '"></div>' +
+      '<div class="yz-note">Settings are saved on this device. Set them once on each device you study on.</div>';
+    var o = overlay(html);
+    o.addEventListener("click", function (e) {
+      var t = e.target.closest ? e.target.closest("[data-set]") : null;
+      if (!t) return;
+      var v = t.getAttribute("data-val");
+      setSetting(t.getAttribute("data-set"), v === "true" ? true : v === "false" ? false : v);
+      openSettings();
+    });
+    var bind = function (id, key, num) {
+      var el = $(id); if (!el) return;
+      el.addEventListener("change", function () {
+        var v = num ? Math.max(num[0], Math.min(num[1], +el.value || 0)) : el.value.trim();
+        setSetting(key, v);
+      });
+    };
+    bind("yz-goalin", "goal", [1, 9999]);
+    bind("yz-daystart", "dayStart", [0, 23]);
+    bind("yz-bgimg", "bgImage");
+    var sc = $("yz-scale");
+    if (sc) sc.addEventListener("input", function () { setSetting("scale", +sc.value); });
+  }
+
+  function openStats() {
+    var s = settings(), L = log(), st = streaks(s), goal = +s.goal || 100;
+    var t = L.days[today(s)] || { n: 0, ms: 0 };
+    var active = Object.keys(L.days).filter(function (k) { return L.days[k].n > 0; }).length;
+    var avgSec = L.total ? Math.round(L.ms / L.total / 1000) : 0;
+    var sess = load("sessionStorage", "yuzu.session", 0);
+
+    // Heatmap: last 26 weeks, columns = weeks (Sun..Sat)
+    var weeks = 26, end = new Date(Date.now() - s.dayStart * 3600000);
+    var startD = addDays(end, -((weeks - 1) * 7 + end.getDay()));
+    var cells = "", i, d, k, n, lvl, todayK = today(s);
+    for (i = 0; i < weeks * 7; i++) {
+      d = addDays(startD, i);
+      k = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+      n = L.days[k] ? L.days[k].n : 0;
+      lvl = n === 0 ? 0 : n < goal * 0.25 ? 1 : n < goal * 0.5 ? 2 : n < goal ? 3 : 4;
+      cells += '<i data-l="' + lvl + '" class="' + (k === todayK ? "today" : "") + (d > end ? " future" : "") +
+        '" title="' + k + ": " + n + '"></i>';
+    }
+
+    overlay(
+      '<h2>Your progress <button class="yz-btn" data-yz="close" aria-label="Close">✕</button></h2>' +
+      '<h3>Today</h3><div class="yz-stats">' +
+        stat(t.n, "reviewed") + stat(Math.round(Math.min(100, t.n / goal * 100)) + "%", "of goal") + stat(fmt(t.ms), "time") +
+      "</div>" +
+      '<h3>Streak</h3><div class="yz-stats">' +
+        stat("🔥 " + st.cur, "current") + stat(st.best, "best") + stat(sess, "this session") +
+      "</div>" +
+      '<h3>Last 6 months</h3><div class="yz-heat">' + cells + "</div>" +
+      '<h3>All time</h3><div class="yz-stats">' +
+        stat(L.total || 0, "cards") + stat(active, "days studied") + stat(avgSec + "s", "avg / card") +
+      "</div>" +
+      '<div class="yz-note">Counted by this theme on this device each time you reveal an answer on a Yuzu card. Anki\'s own Stats screen remains the official record.</div>' +
+      '<div style="margin-top:14px"><button class="yz-chip" id="yz-reset">Reset theme stats</button></div>'
+    );
+    var r = $("yz-reset");
+    if (r) r.addEventListener("click", function (e) {
+      e.stopPropagation();
+      if (r.getAttribute("data-armed")) { save("localStorage", "yuzu.log", { days: {}, total: 0, ms: 0 }); renderGoal(); openStats(); }
+      else { r.setAttribute("data-armed", "1"); r.textContent = "Tap again to erase"; }
+    });
+  }
+  function stat(v, label) { return '<div class="yz-stat"><b>' + v + "</b><span>" + label + "</span></div>"; }
+
+  /* ---------- tags -> chips ---------- */
+  function chipTags() {
+    var boxes = document.querySelectorAll(".yz-tags"), i;
+    for (i = 0; i < boxes.length; i++) {
+      if (boxes[i].__yz) continue;
+      boxes[i].__yz = true;
+      var words = boxes[i].textContent.trim().split(/\s+/).filter(Boolean);
+      boxes[i].innerHTML = words.map(function (w) {
+        return '<span class="yz-tag">' + esc(w.split("::").pop()) + "</span>";
+      }).join("");
+    }
+  }
+
+  /* ---------- wiring ---------- */
+  function wire() {
+    var btns = document.querySelectorAll("[data-yz]"), i;
+    for (i = 0; i < btns.length; i++) {
+      if (btns[i].__yz) continue;
+      btns[i].__yz = true;
+      btns[i].addEventListener("click", function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var a = this.getAttribute("data-yz");
+        if (a === "settings") openSettings();
+        else if (a === "stats") openStats();
+      });
+    }
+    var hints = document.querySelectorAll(".yz-hint"), j;
+    for (j = 0; j < hints.length; j++) {
+      if (hints[j].__yz) continue;
+      hints[j].__yz = true;
+      hints[j].addEventListener("click", function (e) { e.stopPropagation(); this.classList.toggle("open"); });
+    }
+    if (!window.__yzKeys) {
+      window.__yzKeys = true;
+      document.addEventListener("keydown", function (e) {
+        if (e.target && /input|textarea/i.test(e.target.tagName)) return;
+        if (e.key === "Escape") closePanel();
+        if (e.key === "h" || e.key === "H") { var h = document.querySelector(".yz-hint"); if (h) h.classList.toggle("open"); }
+      });
+    }
+  }
+
+  /* ---------- universal mode: theme any note type (e.g. imported shared decks) ----------
+     The snippet pasted into a template contains <div class="yz-universal" data-side="front|back">
+     holding hidden Deck/Tags. We move the card's own content into themed faces. */
+  function injectCss() {
+    if (typeof YZ_CSS === "undefined" || document.getElementById("yz-css")) return;
+    var st = document.createElement("style");
+    st.id = "yz-css";
+    st.textContent = YZ_CSS;
+    (document.head || document.documentElement).appendChild(st);
+  }
+
+  function universalWrap() {
+    var markers = document.querySelectorAll(".yz-universal");
+    if (!markers.length || document.querySelector(".yz-wrap")) return;
+    injectCss();
+    var m0 = markers[0], container = m0.parentNode, i;
+    var isBack = false, deck = "", tags = "";
+    for (i = 0; i < markers.length; i++) {
+      if (markers[i].getAttribute("data-side") === "back") isBack = true;
+      var dk = markers[i].querySelector(".yz-u-deck"), tg = markers[i].querySelector(".yz-u-tags");
+      if (dk && !deck) deck = dk.innerHTML;
+      if (tg && !tags) tags = tg.textContent;
+    }
+    for (i = 0; i < markers.length; i++) if (markers[i].parentNode) markers[i].parentNode.removeChild(markers[i]);
+
+    // Find the top-level node holding Anki's <hr id=answer> divider, if any.
+    var ans = document.getElementById("answer"), split = null;
+    if (ans) { split = ans; while (split.parentNode && split.parentNode !== container) split = split.parentNode; if (split.parentNode !== container) split = null; }
+
+    var qNodes = [], aNodes = [], seenSplit = false, nodes = Array.prototype.slice.call(container.childNodes);
+    nodes.forEach(function (n) {
+      if (n.nodeType === 1 && /^(SCRIPT|STYLE)$/.test(n.tagName)) return; // leave scripts/styles in place
+      if (n === split) { seenSplit = true; return; }
+      if (isBack && (!split || seenSplit)) aNodes.push(n); else qNodes.push(n);
+    });
+
+    var top = document.createElement("div");
+    top.className = "yz-wrap";
+    top.innerHTML = '<div class="yz-top"><div class="yz-deck"></div>' +
+      '<span class="yz-pill" id="yz-timer">⏱ 0:00</span>' +
+      '<span class="yz-pill" id="yz-goal"><svg class="yz-ring" viewBox="0 0 22 22"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" cx="11" cy="11" r="9"/></svg><span id="yz-goal-n">0</span></span>' +
+      '<button class="yz-btn" data-yz="stats" aria-label="Progress">📊</button>' +
+      '<button class="yz-btn" data-yz="settings" aria-label="Appearance">🎨</button></div>';
+    top.querySelector(".yz-deck").innerHTML = deck;
+    container.insertBefore(top, container.firstChild);
+
+    if (qNodes.length) {
+      var qf = document.createElement("div");
+      qf.className = "yz-face yz-q-face yz-anim yz-u";
+      var q = document.createElement("div"); q.className = "yz-q yz-q-plain";
+      qNodes.forEach(function (n) { q.appendChild(n); });
+      qf.appendChild(q); top.appendChild(qf);
+    }
+    if (isBack) {
+      var aw = document.createElement("div");
+      aw.className = "yz-wrap"; aw.id = "yz-back";
+      var af = document.createElement("div");
+      af.className = "yz-face yz-a yz-anim yz-u";
+      var a = document.createElement("div"); a.className = "yz-a-content";
+      aNodes.forEach(function (n) { a.appendChild(n); });
+      af.appendChild(a);
+      if (tags.trim()) { var t = document.createElement("div"); t.className = "yz-tags"; t.textContent = tags; af.appendChild(t); }
+      aw.appendChild(af);
+      container.insertBefore(aw, top.nextSibling);
+    }
+  }
+
+  function init() {
+    universalWrap();
+    var w = document.querySelector(".yz-wrap");
+    if (!w || w.getAttribute("data-yz-init")) return; // already ran for this card (e.g. snippet copied in via FrontSide)
+    w.setAttribute("data-yz-init", "1");
+    closePanel();
+    chipTags();
+    apply();
+    wire();
+    if (document.getElementById("yz-back")) onBack(); else onFront();
+    // Re-apply if Anki toggles night mode while a card is open
+    if (window.MutationObserver && !window.__yzObs) {
+      window.__yzObs = new MutationObserver(function () { if (settings().mode === "auto") apply(); });
+      window.__yzObs.observe(document.body, { attributes: true, attributeFilter: ["class"] });
+    }
+  }
+
+  // Anki inserts the card HTML first, then runs scripts; defer one tick so the back side's markup is present.
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
+  else setTimeout(init, 0);
+})();

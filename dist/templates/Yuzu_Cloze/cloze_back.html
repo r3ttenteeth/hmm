@@ -354,7 +354,78 @@
     }
   }
 
+  /* ---------- universal mode: theme any note type (e.g. imported shared decks) ----------
+     The snippet pasted into a template contains <div class="yz-universal" data-side="front|back">
+     holding hidden Deck/Tags. We move the card's own content into themed faces. */
+  function injectCss() {
+    if (typeof YZ_CSS === "undefined" || document.getElementById("yz-css")) return;
+    var st = document.createElement("style");
+    st.id = "yz-css";
+    st.textContent = YZ_CSS;
+    (document.head || document.documentElement).appendChild(st);
+  }
+
+  function universalWrap() {
+    var markers = document.querySelectorAll(".yz-universal");
+    if (!markers.length || document.querySelector(".yz-wrap")) return;
+    injectCss();
+    var m0 = markers[0], container = m0.parentNode, i;
+    var isBack = false, deck = "", tags = "";
+    for (i = 0; i < markers.length; i++) {
+      if (markers[i].getAttribute("data-side") === "back") isBack = true;
+      var dk = markers[i].querySelector(".yz-u-deck"), tg = markers[i].querySelector(".yz-u-tags");
+      if (dk && !deck) deck = dk.innerHTML;
+      if (tg && !tags) tags = tg.textContent;
+    }
+    for (i = 0; i < markers.length; i++) if (markers[i].parentNode) markers[i].parentNode.removeChild(markers[i]);
+
+    // Find the top-level node holding Anki's <hr id=answer> divider, if any.
+    var ans = document.getElementById("answer"), split = null;
+    if (ans) { split = ans; while (split.parentNode && split.parentNode !== container) split = split.parentNode; if (split.parentNode !== container) split = null; }
+
+    var qNodes = [], aNodes = [], seenSplit = false, nodes = Array.prototype.slice.call(container.childNodes);
+    nodes.forEach(function (n) {
+      if (n.nodeType === 1 && /^(SCRIPT|STYLE)$/.test(n.tagName)) return; // leave scripts/styles in place
+      if (n === split) { seenSplit = true; return; }
+      if (isBack && (!split || seenSplit)) aNodes.push(n); else qNodes.push(n);
+    });
+
+    var top = document.createElement("div");
+    top.className = "yz-wrap";
+    top.innerHTML = '<div class="yz-top"><div class="yz-deck"></div>' +
+      '<span class="yz-pill" id="yz-timer">⏱ 0:00</span>' +
+      '<span class="yz-pill" id="yz-goal"><svg class="yz-ring" viewBox="0 0 22 22"><circle class="bg" cx="11" cy="11" r="9"/><circle class="fg" cx="11" cy="11" r="9"/></svg><span id="yz-goal-n">0</span></span>' +
+      '<button class="yz-btn" data-yz="stats" aria-label="Progress">📊</button>' +
+      '<button class="yz-btn" data-yz="settings" aria-label="Appearance">🎨</button></div>';
+    top.querySelector(".yz-deck").innerHTML = deck;
+    container.insertBefore(top, container.firstChild);
+
+    if (qNodes.length) {
+      var qf = document.createElement("div");
+      qf.className = "yz-face yz-q-face yz-anim yz-u";
+      var q = document.createElement("div"); q.className = "yz-q yz-q-plain";
+      qNodes.forEach(function (n) { q.appendChild(n); });
+      qf.appendChild(q); top.appendChild(qf);
+    }
+    if (isBack) {
+      var aw = document.createElement("div");
+      aw.className = "yz-wrap"; aw.id = "yz-back";
+      var af = document.createElement("div");
+      af.className = "yz-face yz-a yz-anim yz-u";
+      var a = document.createElement("div"); a.className = "yz-a-content";
+      aNodes.forEach(function (n) { a.appendChild(n); });
+      af.appendChild(a);
+      if (tags.trim()) { var t = document.createElement("div"); t.className = "yz-tags"; t.textContent = tags; af.appendChild(t); }
+      aw.appendChild(af);
+      container.insertBefore(aw, top.nextSibling);
+    }
+  }
+
   function init() {
+    universalWrap();
+    var w = document.querySelector(".yz-wrap");
+    if (!w || w.getAttribute("data-yz-init")) return; // already ran for this card (e.g. snippet copied in via FrontSide)
+    w.setAttribute("data-yz-init", "1");
     closePanel();
     chipTags();
     apply();
@@ -368,7 +439,8 @@
   }
 
   // Anki inserts the card HTML first, then runs scripts; defer one tick so the back side's markup is present.
-  setTimeout(init, 0);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", function () { setTimeout(init, 0); });
+  else setTimeout(init, 0);
 })();
 
 </script>

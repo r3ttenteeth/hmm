@@ -155,6 +155,10 @@ html, body, .card { --radius: 22px; }
 .yz-hint.open .yz-hint-label { display: none; }
 .yz-hint.open .yz-hint-body { display: inline; }
 
+/* Universal mode: keep the imported deck's own text sizing */
+.yz-q-plain { font-size: 1em; font-weight: inherit; }
+.yz-u .yz-q-plain, .yz-u .yz-a-content { text-align: inherit; }
+
 /* Hide the default answer separator */
 #answer { display: none; }
 

@@ -35,6 +35,29 @@ Open the settings with the 🎨 button and the stats with the 📊 button, both 
 
 You can also import the file on Anki desktop and sync. The note types will then reach your iPad.
 
+## Theme imported or shared decks (no note-type change)
+
+Shared decks come with their own note types, so they won't look different until you add the snippet below. Do this once per note type, and every card that uses it gets themed, including new ones:
+
+1. Import `Yuzu-Theme.apkg` first. This also installs the theme script (`_yuzu.js`) into your media folder.
+2. Open the deck's note type: **desktop:** *Tools → Manage Note Types → (the deck's type) → Cards*. **AnkiMobile:** find *Notetypes* in the settings, pick the type, then *Cards*.
+3. Paste at the **very end** of the **Front Template**:
+   ```html
+   <div class="yz-universal" data-side="front" style="display:none"><span class="yz-u-deck">{{Deck}}</span><span class="yz-u-tags">{{Tags}}</span></div>
+   <script src="_yuzu.js"></script>
+   ```
+4. Paste at the **very end** of the **Back Template** (only `front` changes to `back`):
+   ```html
+   <div class="yz-universal" data-side="back" style="display:none"><span class="yz-u-deck">{{Deck}}</span><span class="yz-u-tags">{{Tags}}</span></div>
+   <script src="_yuzu.js"></script>
+   ```
+5. If the note type has several card types (e.g. *Recognition* and *Production*), repeat steps 3–4 for each one.
+6. Save and sync.
+
+You don't need to change **Styling**: the theme adds its own CSS. The deck's own content and layout stay the same, wrapped inside the themed card. To undo, delete the pasted lines.
+
+**If the short snippet shows nothing new** (e.g. `_yuzu.js` didn't sync to the device), paste the contents of `dist/universal/front-full.html` and `back-full.html` instead. They include the whole theme and don't need the media file.
+
 ## Install by copy-paste (keep your own note type)
 
 Use **Manage Note Types → (your type) → Cards** and paste in:

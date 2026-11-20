@@ -18,6 +18,21 @@ JS = (THEME / "yuzu.js").read_text()
 assert "{{" not in JS and "{{" not in CSS, "'{{' would be parsed by Anki as a field"
 SCRIPT = f"<script>\n{JS}\n</script>"
 
+# Universal mode: CSS travels inside the JS so one paste themes any note type.
+import json
+UNIVERSAL_JS = f"var YZ_CSS = {json.dumps(CSS)};\n{JS}"
+assert "{{" not in UNIVERSAL_JS and "</script" not in UNIVERSAL_JS
+
+
+def marker(side):
+    return (f'<div class="yz-universal" data-side="{side}" style="display:none">'
+            '<span class="yz-u-deck">{{Deck}}</span><span class="yz-u-tags">{{Tags}}</span></div>')
+
+
+def universal_snippet(side, inline):
+    body = f"<script>\n{UNIVERSAL_JS}\n</script>" if inline else '<script src="_yuzu.js"></script>'
+    return f"\n<!-- Yuzu Theme (universal) -->\n{marker(side)}\n{body}\n"
+
 TOP_BAR = """<div class="yz-top">
   <div class="yz-deck">{{Deck}}</div>
   <span class="yz-pill" id="yz-timer">⏱ 0:00</span>
@@ -141,6 +156,15 @@ def write_templates():
             (d / f"{slug}_back.html").write_text(a)
 
 
+def write_universal():
+    d = DIST / "universal"
+    d.mkdir(parents=True, exist_ok=True)
+    (DIST / "_yuzu.js").write_text(UNIVERSAL_JS)
+    for side in ("front", "back"):
+        (d / f"{side}-short.html").write_text(universal_snippet(side, inline=False))
+        (d / f"{side}-full.html").write_text(universal_snippet(side, inline=True))
+
+
 def write_apkg():
     import genanki
 
@@ -155,11 +179,14 @@ def write_apkg():
         )
         for fields in SAMPLES[name]:
             deck.add_note(genanki.Note(model=model, fields=fields, tags=["yuzu-sample"]))
-    genanki.Package(deck).write_to_file(DIST / "Yuzu-Theme.apkg")
+    pkg = genanki.Package(deck)
+    pkg.media_files = [str(DIST / "_yuzu.js")]  # lets the short universal snippet load the theme from media
+    pkg.write_to_file(DIST / "Yuzu-Theme.apkg")
 
 
 if __name__ == "__main__":
     DIST.mkdir(exist_ok=True)
     write_templates()
+    write_universal()
     write_apkg()
     print("Built", DIST / "Yuzu-Theme.apkg")
