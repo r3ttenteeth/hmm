@@ -242,3 +242,14 @@ html, body, .card { --radius: 22px; }
   .yz-heat i[data-l="1"], .yz-heat i[data-l="2"] { background: var(--bg2); }
   .yz-heat i[data-l="3"] { background: var(--accent); }
 }
+
+/* ---------- Phones: give the deck name its own line ---------- */
+@media (max-width: 480px) {
+  .card { padding: 10px 10px 32px; }
+  .yz-top { flex-wrap: wrap; row-gap: 6px; }
+  .yz-deck { flex-basis: 100%; }
+  .yz-top .yz-pill:first-of-type { margin-left: auto; }
+  .yz-face { padding: 22px 16px; }
+  .yz-stats { gap: 6px; }
+  .yz-stat b { font-size: 19px; }
+}

@@ -1,4 +1,4 @@
-# Yuzu Theme for Anki (works on iPad)
+# Yuzu Theme for Anki (works on iPad and iPhone)
 
 A themed set of Anki note types with a settings panel, stats, a heatmap, streaks, a daily goal, a timer and animations. It is built entirely from card templates (HTML, CSS and JavaScript), so it runs in **AnkiMobile on iPad/iPhone**, Anki desktop, AnkiDroid and AnkiWeb.
 
